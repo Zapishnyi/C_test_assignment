@@ -1,5 +1,5 @@
-﻿using ConsoleFileWriterWatcher.Services;
-using ConsoleFileWriterWatcher.Helpers;
+﻿using ConsoleFileWriterWatcher.Helpers;
+using ConsoleFileWriterWatcher.Services;
 
 const string OutputDir = "data";
 var configFile = "config/config.csv";
@@ -16,8 +16,8 @@ var currentFiles = config.Load(configFile);
 
 if (currentFiles == null)
 {
-   watcher.OnConfigMissing();
-   return;
+    watcher.OnConfigMissing();
+    return;
 }
 
 foreach (var file in currentFiles)
@@ -34,23 +34,33 @@ Console.CancelKeyPress += (_, e) =>
     shutdownEvent.Set();
 };
 
-var timer = new Timer(_ =>
-{
-    foreach (var file in writer.ActiveFiles())
+var timer = new Timer(
+    _ =>
     {
-        writer.WriteDot(file);
-    }
-}, null, 0, 1000);
+        foreach (var file in writer.ActiveFiles())
+        {
+            writer.WriteDot(file);
+        }
+    },
+    null,
+    0,
+    1000
+);
 
 watcher.Start(
     onChanged: () =>
     {
-        var config = new ConfigContentExtractService();
+        var currentFiles = config.Load(configFile);
 
-        var current = config.Load(configFile);
+        if (currentFiles == null)
+        {
+            watcher.OnConfigMissing();
+            return;
+        }
+
         var active = writer.ActiveFiles();
 
-        foreach (var file in current)
+        foreach (var file in currentFiles)
         {
             if (!active.Contains(file))
             {
@@ -61,7 +71,7 @@ watcher.Start(
 
         foreach (var file in active)
         {
-            if (!current.Contains(file))
+            if (!currentFiles.Contains(file))
             {
                 writer.StopFile(file);
             }
@@ -73,9 +83,11 @@ watcher.Start(
         watcher.Stop();
         timer.Dispose();
         shutdownEvent.Set();
-    });
+    }
+);
 
 Console.WriteLine("Console File Writer Watcher is running. Press Ctrl+C to stop.");
+
 shutdownEvent.Wait();
 
 var activeFiles = writer.ActiveFiles();

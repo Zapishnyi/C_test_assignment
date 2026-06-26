@@ -19,7 +19,14 @@ public class FileWriterService
             if (!string.IsNullOrEmpty(dir) && !Directory.Exists(dir))
                 Directory.CreateDirectory(dir);
 
-            var stream = new FileStream(outputPath, FileMode.Append, FileAccess.Write, FileShare.Read, 4096, FileOptions.WriteThrough);
+            var stream = new FileStream(
+                outputPath,
+                FileMode.Append,
+                FileAccess.Write,
+                FileShare.Read,
+                4096,
+                FileOptions.WriteThrough
+            );
             var writer = new StreamWriter(stream, Encoding.UTF8);
 
             writer.WriteLine($"Started: {DateTime.Now:yyyy-MM-dd HH:mm:ss}");

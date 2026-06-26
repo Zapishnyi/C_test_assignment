@@ -28,10 +28,9 @@ public class ConfigWatcherService
 
         _watcher = new FileSystemWatcher(directory, fileName)
         {
-            NotifyFilter = NotifyFilters.LastWrite
-                         | NotifyFilters.CreationTime
-                         | NotifyFilters.FileName,
-            EnableRaisingEvents = true
+            NotifyFilter =
+                NotifyFilters.LastWrite | NotifyFilters.CreationTime | NotifyFilters.FileName,
+            EnableRaisingEvents = true,
         };
 
         _watcher.Changed += OnCsvChanged;
@@ -59,17 +58,22 @@ public class ConfigWatcherService
     private void OnCsvChanged(object sender, FileSystemEventArgs e)
     {
         _debounceTimer?.Dispose();
-        _debounceTimer = new Timer(_ =>
-        {
-            try
+        _debounceTimer = new Timer(
+            _ =>
             {
-                _onChanged?.Invoke();
-            }
-            catch (Exception ex)
-            {
-                Console.Error.WriteLine($"Watcher error: {ex.Message}");
-            }
-        }, null, 200, Timeout.Infinite);
+                try
+                {
+                    _onChanged?.Invoke();
+                }
+                catch (Exception ex)
+                {
+                    Console.Error.WriteLine($"Watcher error: {ex.Message}");
+                }
+            },
+            null,
+            200,
+            Timeout.Infinite
+        );
     }
 
     public void Stop()

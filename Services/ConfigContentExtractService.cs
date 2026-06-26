@@ -19,8 +19,7 @@ public class ConfigContentExtractService
 
             var fileNames = trimmedTextLine.Split(
                 ',',
-                StringSplitOptions.RemoveEmptyEntries |
-                StringSplitOptions.TrimEntries
+                StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries
             );
 
             foreach (var fileName in fileNames)
