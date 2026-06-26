@@ -7,5 +7,3 @@ obj/
 # Runtime data files (created by the application)
 data/
 
-# Configuration (contains runtime file list)
-config/
