@@ -2,17 +2,17 @@
 using ConsoleFileWriterWatcher.Services;
 
 const string OutputDir = "data";
-var configFile = "config/config.csv";
+var configFilePath = "config/config.csv";
 
 var writer = new FileWriterService();
 var pathHelper = new PathHelper(OutputDir);
 
 Directory.CreateDirectory(OutputDir);
 
-var config = new ConfigContentExtractService();
-var watcher = new ConfigWatcherService(configFile);
+var configContent = new ConfigContentService();
+var configWatcher = new ConfigWatcherService(configFilePath);
 
-var currentFiles = config.Load(configFile);
+var currentFiles = configContent.Extract(configFilePath);
 
 if (currentFiles == null)
 {
@@ -47,10 +47,10 @@ var timer = new Timer(
     1000
 );
 
-watcher.Start(
+configWatcher.Start(
     onChanged: () =>
     {
-        var currentFiles = config.Load(configFile);
+        var currentFiles = configContent.Extract(configFilePath);
 
         if (currentFiles == null)
         {
@@ -99,5 +99,5 @@ foreach (var file in activeFiles)
 }
 
 writer.StopAll();
-watcher.Stop();
+configWatcher.Stop();
 timer.Dispose();

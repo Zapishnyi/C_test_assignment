@@ -1,8 +1,8 @@
 namespace ConsoleFileWriterWatcher.Services;
 
-public class ConfigContentExtractService
+public class ConfigContentService
 {
-    public List<string>? Load(string configFilePath)
+    public List<string>? Extract(string configFilePath)
     {
         if (!File.Exists(configFilePath))
             return null;
