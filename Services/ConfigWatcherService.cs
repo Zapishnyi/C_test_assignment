@@ -35,8 +35,8 @@ public class ConfigWatcherService
 
         _watcher.Changed += OnCsvChanged;
         _watcher.Created += OnCsvChanged;
-        _watcher.Deleted += OnCsvDeleted;
-        _watcher.Renamed += OnCsvRenamed;
+        _watcher.Deleted += OnCsvMissing;
+        _watcher.Renamed += OnCsvMissing;
     }
 
     public void OnConfigMissing()
@@ -45,12 +45,7 @@ public class ConfigWatcherService
         _onConfigMissing?.Invoke();
     }
 
-    private void OnCsvDeleted(object sender, FileSystemEventArgs e)
-    {
-        OnConfigMissing();
-    }
-
-    private void OnCsvRenamed(object sender, RenamedEventArgs e)
+    private void OnCsvMissing(object sender, EventArgs e)
     {
         OnConfigMissing();
     }
