@@ -40,7 +40,7 @@ public class ConfigWatcherService
         _watcher.Renamed += OnCsvRenamed;
     }
 
-    private void OnConfigMissing()
+    public void OnConfigMissing()
     {
         Console.Error.WriteLine("ERROR: Config file is missing. Terminating program.");
         _onConfigMissing?.Invoke();

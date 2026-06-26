@@ -2,10 +2,10 @@ namespace ConsoleFileWriterWatcher.Services;
 
 public class ConfigContentExtractService
 {
-    public List<string> Load(string configFilePath)
+    public List<string>? Load(string configFilePath)
     {
         if (!File.Exists(configFilePath))
-            return new();
+            return null;
 
         var configurationContent = File.ReadAllLines(configFilePath);
         var result = new List<string>();

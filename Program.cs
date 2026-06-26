@@ -10,9 +10,15 @@ var pathHelper = new PathHelper(OutputDir);
 Directory.CreateDirectory(OutputDir);
 
 var config = new ConfigContentExtractService();
+var watcher = new ConfigWatcherService(configFile);
+
 var currentFiles = config.Load(configFile);
 
-var watcher = new ConfigWatcherService(configFile);
+if (currentFiles == null)
+{
+   watcher.OnConfigMissing();
+   return;
+}
 
 foreach (var file in currentFiles)
 {
