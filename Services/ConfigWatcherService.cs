@@ -6,14 +6,14 @@ public class ConfigWatcherService
     private readonly string _csvAbsolutePath;
     private Timer? _debounceTimer;
     private Action? _onChanged;
-    private Action? _onConfigMissing;
+    private Action _onConfigMissing = null!;
 
     public ConfigWatcherService(string csvRelativePath)
     {
         _csvAbsolutePath = Path.GetFullPath(csvRelativePath);
     }
 
-    public void Start(Action onChanged, Action? onConfigMissing = null)
+    public void Start(Action onChanged, Action onConfigMissing)
     {
         _onChanged = onChanged;
         _onConfigMissing = onConfigMissing;
@@ -39,15 +39,10 @@ public class ConfigWatcherService
         _watcher.Renamed += OnCsvMissing;
     }
 
-    public void OnConfigMissing()
-    {
-        Console.Error.WriteLine("ERROR: Config file is missing. Terminating program.");
-        _onConfigMissing?.Invoke();
-    }
-
     private void OnCsvMissing(object sender, EventArgs e)
     {
-        OnConfigMissing();
+        Console.Error.WriteLine("ERROR: Config file is missing. Terminating program.");
+        _onConfigMissing();
     }
 
     private void OnCsvChanged(object sender, FileSystemEventArgs e)

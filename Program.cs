@@ -16,7 +16,7 @@ var currentFiles = config.Load(configFile);
 
 if (currentFiles == null)
 {
-    watcher.OnConfigMissing();
+    Console.Error.WriteLine("ERROR: Config file is missing. Terminating program.");
     return;
 }
 
@@ -54,7 +54,7 @@ watcher.Start(
 
         if (currentFiles == null)
         {
-            watcher.OnConfigMissing();
+            Console.Error.WriteLine("ERROR: Config file is missing. Terminating program.");
             return;
         }
 
@@ -80,8 +80,6 @@ watcher.Start(
     onConfigMissing: () =>
     {
         writer.StopAll();
-        watcher.Stop();
-        timer.Dispose();
         shutdownEvent.Set();
     }
 );
