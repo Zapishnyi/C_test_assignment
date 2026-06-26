@@ -1,30 +1,25 @@
 ﻿using ConsoleFileWriterWatcher.Services;
+using ConsoleFileWriterWatcher.Helpers;
 
 const string OutputDir = "data";
-
 var configFile = "config/config.csv";
 
 var writer = new FileWriterService();
+var pathHelper = new PathHelper(OutputDir);
 
-// Ensure output directory exists
 Directory.CreateDirectory(OutputDir);
 
-// Helper to map config filename to output path (preserves subdirectory structure)
-string MapToOutputPath(string fileName) => Path.Combine(OutputDir, fileName);
-
-// 1. Load initial files from CSV
 var config = new ConfigContentExtractService();
 var currentFiles = config.Load(configFile);
 
+var watcher = new ConfigWatcherService(configFile);
 
-// 2. Start writing to files (appends to existing files or creates new ones)
 foreach (var file in currentFiles)
 {
-    var outputPath = MapToOutputPath(file);
+    var outputPath = pathHelper.MapToOutputPath(file);
     writer.StartFile(file, outputPath);
 }
 
-// 3. Handle graceful shutdown on Ctrl+C
 var shutdownEvent = new ManualResetEventSlim(false);
 
 Console.CancelKeyPress += (_, e) =>
@@ -33,7 +28,6 @@ Console.CancelKeyPress += (_, e) =>
     shutdownEvent.Set();
 };
 
-// 4. Write dots every second
 var timer = new Timer(_ =>
 {
     foreach (var file in writer.ActiveFiles())
@@ -41,9 +35,6 @@ var timer = new Timer(_ =>
         writer.WriteDot(file);
     }
 }, null, 0, 1000);
-
-// 5. Watch CSV for changes
-var watcher = new ConfigWatcherService(configFile);
 
 watcher.Start(
     onChanged: () =>
@@ -53,17 +44,15 @@ watcher.Start(
         var current = config.Load(configFile);
         var active = writer.ActiveFiles();
 
-        // New files added to CSV -> start writing
         foreach (var file in current)
         {
             if (!active.Contains(file))
             {
-                var outputPath = MapToOutputPath(file);
+                var outputPath = pathHelper.MapToOutputPath(file);
                 writer.StartFile(file, outputPath);
             }
         }
 
-        // Files removed from CSV -> stop writing
         foreach (var file in active)
         {
             if (!current.Contains(file))
@@ -80,7 +69,6 @@ watcher.Start(
         shutdownEvent.Set();
     });
 
-// 6. Main loop
 Console.WriteLine("Console File Writer Watcher is running. Press Ctrl+C to stop.");
 shutdownEvent.Wait();
 

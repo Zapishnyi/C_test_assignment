@@ -12,11 +12,9 @@ public class FileWriterService
     {
         lock (_lock)
         {
-            // If we already have a writer for this config name, just continue (re-appeared)
             if (_writers.ContainsKey(fileName))
                 return;
 
-            // Ensure directory exists
             var dir = Path.GetDirectoryName(outputPath);
             if (!string.IsNullOrEmpty(dir) && !Directory.Exists(dir))
                 Directory.CreateDirectory(dir);
@@ -24,7 +22,6 @@ public class FileWriterService
             var stream = new FileStream(outputPath, FileMode.Append, FileAccess.Write, FileShare.Read, 4096, FileOptions.WriteThrough);
             var writer = new StreamWriter(stream, Encoding.UTF8);
 
-            // Write start header
             writer.WriteLine($"Started: {DateTime.Now:yyyy-MM-dd HH:mm:ss}");
             writer.Flush();
 
@@ -60,13 +57,11 @@ public class FileWriterService
             if (!_writers.TryGetValue(fileName, out var writer))
                 return;
 
-            // Flush any remaining dots on current line
             if (_dotCounts[fileName] > 0)
             {
                 writer.WriteLine();
             }
 
-            // Write stop footer
             writer.WriteLine($"Stopped: {DateTime.Now:yyyy-MM-dd HH:mm:ss}");
             writer.Flush();
 
@@ -82,7 +77,7 @@ public class FileWriterService
     {
         lock (_lock)
         {
-            return new List<string>(_writers.Keys);
+            return [.. _writers.Keys];
         }
     }
 

@@ -28,7 +28,9 @@ public class ConfigWatcherService
 
         _watcher = new FileSystemWatcher(directory, fileName)
         {
-            NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.CreationTime | NotifyFilters.FileName,
+            NotifyFilter = NotifyFilters.LastWrite
+                         | NotifyFilters.CreationTime
+                         | NotifyFilters.FileName,
             EnableRaisingEvents = true
         };
 
@@ -56,7 +58,6 @@ public class ConfigWatcherService
 
     private void OnCsvChanged(object sender, FileSystemEventArgs e)
     {
-        // Debounce: wait 200ms after last change before triggering
         _debounceTimer?.Dispose();
         _debounceTimer = new Timer(_ =>
         {
